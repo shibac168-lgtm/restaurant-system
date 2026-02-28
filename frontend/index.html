@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasturi Restaurant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+/* HEADER */
+header{
+    background:#131921;
+    color:white;
+    padding:15px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+header h2{
+    font-weight:600;
+}
+
+header a{
+    color:white;
+    text-decoration:none;
+    background:#ff9900;
+    padding:8px 15px;
+    border-radius:5px;
+}
+
+/* HERO */
+.hero{
+    background:linear-gradient(45deg,#ff512f,#dd2476);
+    color:white;
+    text-align:center;
+    padding:60px 20px;
+}
+
+.hero h1{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+/* PRODUCTS */
+.products{
+    padding:40px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+}
+
+.product-card{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.product-card:hover{
+    transform:translateY(-5px);
+}
+
+.product-card img{
+    width:100%;
+    border-radius:10px;
+}
+
+.product-card h3{
+    margin:10px 0;
+}
+
+.price{
+    font-weight:600;
+    color:#e63946;
+}
+
+.product-card button{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    border:none;
+    background:#ff9900;
+    color:white;
+    font-weight:600;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.product-card button:hover{
+    background:#e68a00;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:20px;
+    background:#131921;
+    color:white;
+    margin-top:40px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Kasturi Restaurant</h2>
+    <a href="payment.html">🛒 View Cart</a>
+</header>
+
+<section class="hero">
+    <h1>Delicious Food Delivered Fast</h1>
+    <p>Order your favorite meals now</p>
+</section>
+
+<section class="products">
+
+    <div class="product-card">
+        <img src="https://source.unsplash.com/400x300/?biryani">
+        <h3>Chicken Biryani</h3>
+        <p class="price">₹250</p>
+        <button onclick="addToCart('Chicken Biryani',250)">Add to Cart</button>
+    </div>
+
+    <div class="product-card">
+        <img src="https://source.unsplash.com/400x300/?pizza">
+        <h3>Cheese Pizza</h3>
+        <p class="price">₹300</p>
+        <button onclick="addToCart('Cheese Pizza',300)">Add to Cart</button>
+    </div>
+
+    <div class="product-card">
+        <img src="https://source.unsplash.com/400x300/?burger">
+        <h3>Veg Burger</h3>
+        <p class="price">₹150</p>
+        <button onclick="addToCart('Veg Burger',150)">Add to Cart</button>
+    </div>
+
+    <div class="product-card">
+        <img src="https://source.unsplash.com/400x300/?noodles">
+        <h3>Hakka Noodles</h3>
+        <p class="price">₹200</p>
+        <button onclick="addToCart('Hakka Noodles',200)">Add to Cart</button>
+    </div>
+
+</section>
+
+<footer>
+    © 2026 Kasturi Restaurant | All Rights Reserved
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

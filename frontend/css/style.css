@@ -1,0 +1,66 @@
+body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f4f6f9;
+}
+
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:#1e1e2f;
+    color:white;
+}
+
+.navbar a{
+    color:white;
+    margin-left:20px;
+    text-decoration:none;
+}
+
+.hero{
+    text-align:center;
+    padding:80px 20px;
+    background:linear-gradient(45deg,#ff512f,#dd2476);
+    color:white;
+}
+
+.hero button{
+    padding:12px 25px;
+    border:none;
+    background:white;
+    color:#dd2476;
+    font-weight:bold;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+.menu{
+    padding:50px;
+    text-align:center;
+}
+
+.food-container{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.food-card{
+    background:white;
+    padding:20px;
+    width:220px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.food-card button{
+    background:#ff512f;
+    border:none;
+    padding:8px 15px;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
