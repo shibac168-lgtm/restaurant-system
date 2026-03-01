@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
+    orderId: {
+        type: String,
+        unique: true
+    },
     razorpay_order_id: String,
     razorpay_payment_id: String,
     razorpay_signature: String,

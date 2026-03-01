@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Your Order</title>
+</head>
+<body>
+
+<h2>Track Order</h2>
+
+<input type="text" id="orderIdInput" placeholder="Enter Order ID">
+<button onclick="trackOrder()">Track</button>
+
+<h3 id="statusResult"></h3>
+
+<script>
+async function trackOrder() {
+    const orderId = document.getElementById("orderIdInput").value;
+
+    const response = await fetch(
+        "https://restaurant-system-1-de4m.onrender.com/api/payment/track/" + orderId
+    );
+
+    const data = await response.json();
+
+    if (response.status === 404) {
+        document.getElementById("statusResult").innerText = "Order Not Found";
+    } else {
+        document.getElementById("statusResult").innerText =
+            "Current Status: " + data.status;
+    }
+}
+</script>
+
+</body>
+</html>
