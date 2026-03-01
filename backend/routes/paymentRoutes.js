@@ -99,6 +99,9 @@ router.post("/verify", async (req, res) => {
 // ===============================
 // 3️⃣ TRACK ORDER
 // ===============================
+// ===============================
+// 3️⃣ TRACK ORDER
+// ===============================
 router.get("/track/:orderId", async (req, res) => {
     try {
 
@@ -107,21 +110,28 @@ router.get("/track/:orderId", async (req, res) => {
         });
 
         if (!order) {
-            return res.status(404).json({ message: "Order not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
         }
 
         res.json({
+            success: true,
             orderId: order.orderId,
             status: order.status,
             amount: order.totalAmount,
+            items: order.items,
             history: order.statusHistory
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
-
 
 // ===============================
 // 4️⃣ ADMIN UPDATE STATUS
