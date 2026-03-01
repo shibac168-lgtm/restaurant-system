@@ -10,10 +10,22 @@ const orderSchema = new mongoose.Schema({
     razorpay_signature: String,
     items: Array,
     totalAmount: Number,
+
     status: {
         type: String,
         default: "Paid"
     },
+
+    statusHistory: [
+        {
+            status: String,
+            time: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
+
     createdAt: {
         type: Date,
         default: Date.now

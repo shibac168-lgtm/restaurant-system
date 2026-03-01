@@ -30,26 +30,68 @@
             display: inline-block;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: left;
+            min-width: 300px;
         }
+
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .current-status {
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+            margin-bottom: 15px;
+        }
+
     </style>
 </head>
 <body>
 
 <h2>Track Your Order</h2>
 
-<input type="text" id="orderIdInput" placeholder="Enter Order ID (KST-xxxx)">
+<input type="text" id="orderIdInput" placeholder="Enter Order ID (ORD-2026-XXXXXX)">
 <button onclick="trackOrder()">Track</button>
 
 <div class="status-box" id="result" style="display:none;">
-    <h3 id="statusText"></h3>
+
+    <div class="current-status" id="statusText"></div>
     <p id="amountText"></p>
     <p id="dateText"></p>
+
+    <h4>Status History</h4>
+    <div id="historyBox"></div>
+
 </div>
 
 <script>
+
+let currentOrderId = null;
+
+// ==========================
+// TRACK ORDER
+// ==========================
 async function trackOrder() {
 
     const orderId = document.getElementById("orderIdInput").value;
+
+    if (!orderId) {
+        alert("Please enter Order ID");
+        return;
+    }
+
+    currentOrderId = orderId;
+
+    await fetchOrder(orderId);
+}
+
+
+// ==========================
+// FETCH ORDER FUNCTION
+// ==========================
+async function fetchOrder(orderId){
 
     const response = await fetch(
         "https://restaurant-system-1-de4m.onrender.com/api/payment/track/" + orderId
@@ -57,21 +99,52 @@ async function trackOrder() {
 
     const data = await response.json();
 
-    if (response.status === 404) {
+    if (!data.success) {
         alert("Order Not Found ❌");
         return;
     }
 
     document.getElementById("result").style.display = "block";
+
     document.getElementById("statusText").innerText =
         "Current Status: " + data.status;
 
     document.getElementById("amountText").innerText =
         "Total Amount: ₹" + data.amount;
 
-    document.getElementById("dateText").innerText =
-        "Order Date: " + new Date(data.createdAt).toLocaleString();
+    if(data.createdAt){
+        document.getElementById("dateText").innerText =
+            "Order Date: " + new Date(data.createdAt).toLocaleString();
+    }
+
+    // HISTORY SHOW
+    let historyHtml = "";
+
+    data.history.forEach(h => {
+
+        const time = h.time ? new Date(h.time).toLocaleString() : "";
+
+        historyHtml += `
+            <div class="history-item">
+                <strong>${h.status}</strong><br>
+                <small>${time}</small>
+            </div>
+        `;
+    });
+
+    document.getElementById("historyBox").innerHTML = historyHtml;
 }
+
+
+// ==========================
+// AUTO REFRESH EVERY 5 SEC
+// ==========================
+setInterval(() => {
+    if(currentOrderId){
+        fetchOrder(currentOrderId);
+    }
+}, 5000);
+
 </script>
 
 </body>

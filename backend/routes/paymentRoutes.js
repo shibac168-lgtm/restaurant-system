@@ -4,30 +4,23 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Order = require("../models/Order");
 
-// Razorpay instance
+// Razorpay Instance
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// ===============================
-// Generate Professional Order ID
-// ===============================
-function generateOrderId() {
-    const random = Math.floor(1000 + Math.random() * 9000);
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    return `KST-${date}-${random}`;
-}
 
 // ===============================
-// CREATE ORDER
+// 1️⃣ CREATE ORDER (Razorpay)
 // ===============================
 router.post("/create-order", async (req, res) => {
     try {
+
         const { amount } = req.body;
 
         const options = {
-            amount: amount * 100, // convert to paise
+            amount: amount * 100, // convert to paisa
             currency: "INR",
             receipt: "receipt_" + Date.now()
         };
@@ -41,11 +34,13 @@ router.post("/create-order", async (req, res) => {
     }
 });
 
+
 // ===============================
-// VERIFY PAYMENT + SAVE ORDER
+// 2️⃣ VERIFY PAYMENT & SAVE ORDER
 // ===============================
 router.post("/verify", async (req, res) => {
     try {
+
         const {
             razorpay_order_id,
             razorpay_payment_id,
@@ -54,7 +49,7 @@ router.post("/verify", async (req, res) => {
             totalAmount
         } = req.body;
 
-        // Create signature
+        // Create Signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
 
         const expectedSignature = crypto
@@ -62,13 +57,17 @@ router.post("/verify", async (req, res) => {
             .update(body.toString())
             .digest("hex");
 
-        // Verify signature
+        // Verify
         if (expectedSignature !== razorpay_signature) {
-            return res.status(400).json({ success: false, message: "Invalid signature" });
+            return res.status(400).json({ message: "Invalid Signature" });
         }
 
-        // Generate Professional Order ID
-        const customOrderId = generateOrderId();
+        // Professional Custom Order ID
+        const customOrderId =
+            "ORD-" +
+            new Date().getFullYear() +
+            "-" +
+            Math.floor(100000 + Math.random() * 900000);
 
         // Save to MongoDB
         const newOrder = new Order({
@@ -78,7 +77,10 @@ router.post("/verify", async (req, res) => {
             razorpay_signature,
             items,
             totalAmount,
-            status: "Paid"
+            status: "Paid",
+            statusHistory: [
+                { status: "Paid" }
+            ]
         });
 
         await newOrder.save();
@@ -93,11 +95,13 @@ router.post("/verify", async (req, res) => {
     }
 });
 
+
 // ===============================
-// TRACK ORDER (Custom Order ID)
+// 3️⃣ TRACK ORDER
 // ===============================
 router.get("/track/:orderId", async (req, res) => {
     try {
+
         const order = await Order.findOne({
             orderId: req.params.orderId
         });
@@ -110,12 +114,46 @@ router.get("/track/:orderId", async (req, res) => {
             orderId: order.orderId,
             status: order.status,
             amount: order.totalAmount,
-            createdAt: order.createdAt
+            history: order.statusHistory
         });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+// ===============================
+// 4️⃣ ADMIN UPDATE STATUS
+// ===============================
+router.put("/update-status/:orderId", async (req, res) => {
+    try {
+
+        const { status } = req.body;
+
+        const order = await Order.findOne({
+            orderId: req.params.orderId
+        });
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        order.status = status;
+
+        order.statusHistory.push({
+            status: status,
+            time: new Date()
+        });
+
+        await order.save();
+
+        res.json({ success: true });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 module.exports = router;
