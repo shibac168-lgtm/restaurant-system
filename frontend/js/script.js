@@ -107,7 +107,10 @@ async function makePayment() {
             const data = await verifyRes.json();
 
             if (data.success) {
-                alert("Payment Successful! Your Order ID: " + data.orderId);
+                alert("Payment Successful!");
+
+// Redirect with Order ID in URL
+window.location.href = "tracking.html?orderId=" + data.orderId;
             } else {
                 alert("Payment verification failed ❌");
             }
