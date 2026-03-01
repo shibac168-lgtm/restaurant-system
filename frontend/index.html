@@ -33,12 +33,22 @@ header h2{
     font-weight:600;
 }
 
-header a{
+.header-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.header-buttons a{
     color:white;
     text-decoration:none;
     background:#ff9900;
     padding:8px 15px;
     border-radius:5px;
+    font-weight:500;
+}
+
+.header-buttons a:hover{
+    background:#e68a00;
 }
 
 /* HERO */
@@ -119,7 +129,11 @@ footer{
 
 <header>
     <h2>Kasturi Restaurant</h2>
-    <a href="payment.html">🛒 View Cart</a>
+
+    <div class="header-buttons">
+        <a href="tracking.html">📦 Track Order</a>
+        <a href="payment.html">🛒 View Cart</a>
+    </div>
 </header>
 
 <section class="hero">

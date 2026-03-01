@@ -1,19 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Track Your Order</title>
+    <title>Track Your Order - Kasturi Restaurant</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f4f4f4;
+            padding-top: 50px;
+        }
+
+        input {
+            padding: 10px;
+            width: 250px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .status-box {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            display: inline-block;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
 
-<h2>Track Order</h2>
+<h2>Track Your Order</h2>
 
-<input type="text" id="orderIdInput" placeholder="Enter Order ID">
+<input type="text" id="orderIdInput" placeholder="Enter Order ID (KST-xxxx)">
 <button onclick="trackOrder()">Track</button>
 
-<h3 id="statusResult"></h3>
+<div class="status-box" id="result" style="display:none;">
+    <h3 id="statusText"></h3>
+    <p id="amountText"></p>
+    <p id="dateText"></p>
+</div>
 
 <script>
 async function trackOrder() {
+
     const orderId = document.getElementById("orderIdInput").value;
 
     const response = await fetch(
@@ -23,11 +58,19 @@ async function trackOrder() {
     const data = await response.json();
 
     if (response.status === 404) {
-        document.getElementById("statusResult").innerText = "Order Not Found";
-    } else {
-        document.getElementById("statusResult").innerText =
-            "Current Status: " + data.status;
+        alert("Order Not Found ❌");
+        return;
     }
+
+    document.getElementById("result").style.display = "block";
+    document.getElementById("statusText").innerText =
+        "Current Status: " + data.status;
+
+    document.getElementById("amountText").innerText =
+        "Total Amount: ₹" + data.amount;
+
+    document.getElementById("dateText").innerText =
+        "Order Date: " + new Date(data.createdAt).toLocaleString();
 }
 </script>
 
