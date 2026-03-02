@@ -5,12 +5,29 @@ const orderSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
+
+    // Razorpay Details
     razorpay_order_id: String,
     razorpay_payment_id: String,
     razorpay_signature: String,
-    items: Array,
+
+    // Order Details
+    items: [
+        {
+            name: String,
+            price: Number
+        }
+    ],
+
     totalAmount: Number,
 
+    // 👇 NEW FIELDS (Customer Info)
+    customerName: String,
+    phoneNumber: String,
+    tableOrAddress: String,
+    instructions: String,
+
+    // Order Status
     status: {
         type: String,
         default: "Paid"
