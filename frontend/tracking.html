@@ -49,16 +49,29 @@
 
 <script>
 
-// Get Order ID from URL
-const params = new URLSearchParams(window.location.search);
-const orderId = params.get("orderId");
+// ==========================
+// GET ORDER ID (URL + localStorage)
+// ==========================
 
+const params = new URLSearchParams(window.location.search);
+let orderId = params.get("orderId");
+
+// যদি URL এ থাকে → save করো
+if(orderId){
+    localStorage.setItem("activeOrderId", orderId);
+} else {
+    orderId = localStorage.getItem("activeOrderId");
+}
+
+// যদি কিছুই না থাকে
 if(!orderId){
-    document.body.innerHTML = "<h3>No Order Found ❌</h3>";
+    document.body.innerHTML = "<h3>No Active Order ❌</h3>";
 } else {
     fetchOrder(orderId);
 }
 
+// ==========================
+// FETCH ORDER
 // ==========================
 async function fetchOrder(orderId){
 
@@ -81,13 +94,19 @@ async function fetchOrder(orderId){
     document.getElementById("amountText").innerText =
         "Total Amount: ₹" + data.amount;
 
-    document.getElementById("dateText").innerText =
-        "Order Date: " + new Date(data.createdAt).toLocaleString();
+    if(data.createdAt){
+        document.getElementById("dateText").innerText =
+            "Order Date: " + new Date(data.createdAt).toLocaleString();
+    }
 
     let historyHtml = "";
 
     data.history.forEach(h => {
-        const time = h.time ? new Date(h.time).toLocaleString() : "";
+
+        const time = h.time 
+            ? new Date(h.time).toLocaleString()
+            : "Time Not Available";
+
         historyHtml += `
             <div class="history-item">
                 <strong>${h.status}</strong><br>
@@ -97,9 +116,16 @@ async function fetchOrder(orderId){
     });
 
     document.getElementById("historyBox").innerHTML = historyHtml;
+
+    // যদি Delivered হয় → remove active order
+    if(data.status === "Delivered" || data.status === "Served"){
+        localStorage.removeItem("activeOrderId");
+    }
 }
 
-// Auto refresh every 5 sec
+// ==========================
+// AUTO REFRESH
+// ==========================
 setInterval(() => {
     if(orderId){
         fetchOrder(orderId);
