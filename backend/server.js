@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const paymentRoutes = require("./routes/paymentRoutes");
-const adminRoutes = require("./routes/admin");   // ✅ ADD
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
@@ -18,7 +18,10 @@ app.use(express.json());
 // =======================
 // MONGODB CONNECTION
 // =======================
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 .then(() => {
     console.log("✅ MongoDB Connected");
 })
@@ -29,12 +32,16 @@ mongoose.connect(process.env.MONGO_URI)
 // =======================
 // ROUTES
 // =======================
+
+// Payment Routes
 app.use("/api/payment", paymentRoutes);
-app.use("/api/admin", adminRoutes);   // ✅ ADD
+
+// Admin Routes
+app.use("/api/admin", adminRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
-    res.send("Kasturi Restaurant Backend Running 🚀");
+    res.send("🚀 Kasturi Restaurant Backend Running");
 });
 
 // =======================

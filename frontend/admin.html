@@ -1,49 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Admin Panel - Kasturi Restaurant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | Kasturi Restaurant</title>
 
 <style>
 
 body{
-font-family:Arial;
+font-family: Arial;
+margin:0;
 background:#f4f6f9;
-padding:30px;
 }
 
-h1{
+header{
+background:#111;
+color:white;
+padding:20px;
 text-align:center;
+font-size:22px;
+}
+
+.container{
+max-width:1200px;
+margin:30px auto;
+padding:20px;
 }
 
 .order{
 background:white;
 padding:20px;
-margin:20px 0;
-border-radius:8px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.order h3{
+margin-bottom:10px;
+}
+
+.items{
+background:#fafafa;
+padding:10px;
+border-radius:5px;
+margin:10px 0;
+}
+
+.status{
+font-weight:bold;
+color:#ff5722;
+}
+
+select{
+padding:8px;
+border-radius:5px;
+margin-top:10px;
 }
 
 button{
 padding:8px 15px;
 border:none;
-margin:5px;
-cursor:pointer;
+background:#28a745;
+color:white;
 border-radius:5px;
+cursor:pointer;
+margin-left:10px;
 }
 
-.accept{background:orange;color:white;}
-.cooking{background:blue;color:white;}
-.ready{background:green;color:white;}
-.delivered{background:black;color:white;}
+button:hover{
+background:#218838;
+}
 
 </style>
+
 </head>
 
 <body>
 
-<h1>🍽 Kasturi Restaurant Admin</h1>
+<header>
+🍽️ Kasturi Restaurant Admin Panel
+</header>
+
+<div class="container">
+
+<h2>Live Orders</h2>
 
 <div id="orders"></div>
+
+</div>
 
 <script>
 
@@ -58,47 +102,64 @@ const container = document.getElementById("orders");
 
 container.innerHTML="";
 
-orders.forEach(order=>{
+if(orders.length === 0){
+container.innerHTML = "<p>No orders yet</p>";
+return;
+}
+
+orders.forEach(order => {
 
 let itemsHTML="";
 
 order.items.forEach(item=>{
-itemsHTML += `<li>${item.name} - ₹${item.price}</li>`
-})
+itemsHTML += `<li>${item.name} - ₹${item.price}</li>`;
+});
 
-const div = document.createElement("div");
-div.className="order";
+container.innerHTML += `
 
-div.innerHTML = `
+<div class="order">
 
 <h3>Order ID: ${order.orderId}</h3>
 
-<p><b>Status:</b> ${order.status}</p>
+<p><b>Customer:</b> ${order.customerName}</p>
 
+<p><b>Phone:</b> ${order.phoneNumber}</p>
+
+<p><b>Table / Address:</b> ${order.tableOrAddress}</p>
+
+<div class="items">
+<b>Items:</b>
 <ul>
 ${itemsHTML}
 </ul>
+</div>
 
 <p><b>Total:</b> ₹${order.totalAmount}</p>
 
-<button class="accept" onclick="updateStatus('${order._id}','Accepted')">Accept</button>
+<p class="status">Status: ${order.status}</p>
 
-<button class="cooking" onclick="updateStatus('${order._id}','Cooking')">Cooking</button>
+<select id="status-${order._id}">
+<option value="Paid">Paid</option>
+<option value="Preparing">Preparing</option>
+<option value="Ready">Ready</option>
+<option value="Delivered">Delivered</option>
+</select>
 
-<button class="ready" onclick="updateStatus('${order._id}','Ready')">Ready</button>
+<button onclick="updateStatus('${order._id}')">
+Update Status
+</button>
 
-<button class="delivered" onclick="updateStatus('${order._id}','Delivered')">Delivered</button>
+</div>
 
 `;
 
-container.appendChild(div)
-
-})
+});
 
 }
 
+async function updateStatus(id){
 
-async function updateStatus(id,status){
+const status = document.getElementById("status-"+id).value;
 
 await fetch(`https://kasturi-restaurant-backend.onrender.com/api/admin/orders/${id}`,{
 
@@ -108,19 +169,19 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify({
-status:status
-})
+body: JSON.stringify({status})
 
-})
+});
 
-loadOrders()
+alert("Status Updated");
+
+loadOrders();
 
 }
 
-loadOrders()
+loadOrders();
 
-setInterval(loadOrders,5000)
+setInterval(loadOrders,5000);
 
 </script>
 
