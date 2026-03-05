@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const paymentRoutes = require("./routes/paymentRoutes");
+const adminRoutes = require("./routes/admin");   // ✅ ADD
 
 const app = express();
 
@@ -29,6 +30,7 @@ mongoose.connect(process.env.MONGO_URI)
 // ROUTES
 // =======================
 app.use("/api/payment", paymentRoutes);
+app.use("/api/admin", adminRoutes);   // ✅ ADD
 
 // Test Route
 app.get("/", (req, res) => {
