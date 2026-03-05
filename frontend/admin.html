@@ -35,10 +35,6 @@ border-radius:10px;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-.order h3{
-margin-bottom:10px;
-}
-
 .items{
 background:#fafafa;
 padding:10px;
@@ -91,8 +87,11 @@ background:#218838;
 
 <script>
 
-const API = "https://kasturi-restaurant-backend.onrender.com/api/admin/orders";
+const API = "https://restaurant-system-1-de4m.onrender.com/api/admin/orders";
 
+// ======================
+// LOAD ORDERS
+// ======================
 async function loadOrders(){
 
 const res = await fetch(API);
@@ -157,11 +156,14 @@ Update Status
 
 }
 
+// ======================
+// UPDATE STATUS
+// ======================
 async function updateStatus(id){
 
 const status = document.getElementById("status-"+id).value;
 
-await fetch(`https://kasturi-restaurant-backend.onrender.com/api/admin/orders/${id}`,{
+await fetch(`https://restaurant-system-1-de4m.onrender.com/api/admin/orders/${id}`,{
 
 method:"PUT",
 
@@ -178,6 +180,10 @@ alert("Status Updated");
 loadOrders();
 
 }
+
+// ======================
+// AUTO LOAD
+// ======================
 
 loadOrders();
 
