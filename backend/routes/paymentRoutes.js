@@ -10,19 +10,19 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-
-// ===============================
-// 1️⃣ CREATE ORDER (Razorpay)
-// ===============================
+// ==========================
+// CREATE ORDER
+// ==========================
 router.post("/create-order", async (req, res) => {
+
     try {
 
         const { amount } = req.body;
 
         const options = {
-            amount: amount * 100, // convert to paisa
+            amount: amount * 100,
             currency: "INR",
-            receipt: "receipt_" + Date.now()
+            receipt: "order_rcptid_" + Date.now()
         };
 
         const order = await razorpay.orders.create(options);
@@ -30,15 +30,19 @@ router.post("/create-order", async (req, res) => {
         res.json(order);
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+
+        console.log(error);
+        res.status(500).json({ error: "Order Creation Failed" });
+
     }
+
 });
 
+// ==========================
+// VERIFY PAYMENT
+// ==========================
+router.post("/verify-payment", async (req, res) => {
 
-// ===============================
-// 2️⃣ VERIFY PAYMENT & SAVE ORDER
-// ===============================
-router.post("/verify", async (req, res) => {
     try {
 
         const {
@@ -46,10 +50,13 @@ router.post("/verify", async (req, res) => {
             razorpay_payment_id,
             razorpay_signature,
             items,
-            totalAmount
+            totalAmount,
+            customerName,
+            phoneNumber,
+            tableOrAddress,
+            instructions
         } = req.body;
 
-        // Create Signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
 
         const expectedSignature = crypto
@@ -57,113 +64,61 @@ router.post("/verify", async (req, res) => {
             .update(body.toString())
             .digest("hex");
 
-        // Verify
-        if (expectedSignature !== razorpay_signature) {
-            return res.status(400).json({ message: "Invalid Signature" });
-        }
+        if (expectedSignature === razorpay_signature) {
 
-        // Professional Custom Order ID
-        const customOrderId =
-            "ORD-" +
-            new Date().getFullYear() +
-            "-" +
-            Math.floor(100000 + Math.random() * 900000);
+            const newOrder = new Order({
 
-        // Save to MongoDB
-        const newOrder = new Order({
-            orderId: customOrderId,
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-            items,
-            totalAmount,
-            status: "Paid",
-            statusHistory: [
-                { status: "Paid" }
-            ]
-        });
+                orderId: "ORD" + Date.now(),
 
-        await newOrder.save();
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
 
-        res.json({
-            success: true,
-            orderId: customOrderId
-        });
+                items,
+                totalAmount,
 
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+                customerName,
+                phoneNumber,
+                tableOrAddress,
+                instructions,
 
+                status: "Paid",
 
-// ===============================
-// 3️⃣ TRACK ORDER
-// ===============================
-// ===============================
-// 3️⃣ TRACK ORDER
-// ===============================
-router.get("/track/:orderId", async (req, res) => {
-    try {
+                statusHistory: [
+                    {
+                        status: "Paid"
+                    }
+                ]
 
-        const order = await Order.findOne({
-            orderId: req.params.orderId
-        });
-
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: "Order not found"
             });
+
+            await newOrder.save();
+
+            res.json({
+                success: true,
+                message: "Payment Verified & Order Saved"
+            });
+
+        } else {
+
+            res.status(400).json({
+                success: false,
+                message: "Invalid Signature"
+            });
+
         }
 
-        res.json({
-            success: true,
-            orderId: order.orderId,
-            status: order.status,
-            amount: order.totalAmount,
-            items: order.items,
-            history: order.statusHistory
-        });
-
     } catch (error) {
+
+        console.log(error);
+
         res.status(500).json({
             success: false,
-            error: error.message
+            message: "Payment Verification Failed"
         });
+
     }
+
 });
-
-// ===============================
-// 4️⃣ ADMIN UPDATE STATUS
-// ===============================
-router.put("/update-status/:orderId", async (req, res) => {
-    try {
-
-        const { status } = req.body;
-
-        const order = await Order.findOne({
-            orderId: req.params.orderId
-        });
-
-        if (!order) {
-            return res.status(404).json({ message: "Order not found" });
-        }
-
-        order.status = status;
-
-        order.statusHistory.push({
-            status: status,
-            time: new Date()
-        });
-
-        await order.save();
-
-        res.json({ success: true });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 
 module.exports = router;

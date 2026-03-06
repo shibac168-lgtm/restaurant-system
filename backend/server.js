@@ -9,19 +9,11 @@ const adminRoutes = require("./routes/admin");
 
 const app = express();
 
-// =======================
-// MIDDLEWARE
-// =======================
 app.use(cors());
 app.use(express.json());
 
-// =======================
-// MONGODB CONNECTION
-// =======================
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+// MongoDB Connect
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log("✅ MongoDB Connected");
 })
@@ -29,24 +21,14 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log("❌ MongoDB Connection Error:", err);
 });
 
-// =======================
-// ROUTES
-// =======================
-
-// Payment Routes
+// Routes
 app.use("/api/payment", paymentRoutes);
-
-// Admin Routes
 app.use("/api/admin", adminRoutes);
 
-// Test Route
 app.get("/", (req, res) => {
     res.send("🚀 Kasturi Restaurant Backend Running");
 });
 
-// =======================
-// SERVER START
-// =======================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
